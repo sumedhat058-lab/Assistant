@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070812">
+<title>NEXUS — Personal Dashboard</title>
+<style>
+:root{
+  --bg:#070812;--panel:#101323;--panel2:#151a2d;--text:#f4f6ff;--muted:#9299b7;
+  --line:rgba(150,165,255,.15);--blue:#38bdf8;--purple:#a855f7;--cyan:#22d3ee;
+  --green:#34d399;--red:#fb7185;--yellow:#fbbf24;--radius:20px;
+  --shadow:0 18px 60px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+ radial-gradient(ellipse at 10% 0%,rgba(87,45,180,.19),transparent 35%),
+ radial-gradient(ellipse at 100% 15%,rgba(0,164,255,.12),transparent 32%),var(--bg);
+ color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;padding:25px 17px;border-right:1px solid var(--line);background:rgba(8,10,22,.82);backdrop-filter:blur(18px);display:flex;flex-direction:column;z-index:10}
+.brand{display:flex;align-items:center;gap:11px;padding:5px 9px 27px}
+.brand-mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--purple));display:grid;place-items:center;font-weight:900;color:#070812;box-shadow:0 0 25px #7c3aed66}
+.brand h1{font-size:18px;letter-spacing:3px;margin:0}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px;margin-top:2px}
+.nav-label{font-size:10px;letter-spacing:2px;color:#727a9e;padding:12px 12px 8px}
+.nav{display:grid;gap:6px}
+.nav button{border:1px solid transparent;background:transparent;color:#aab1d0;text-align:left;padding:12px;border-radius:13px;display:flex;align-items:center;gap:12px;transition:.2s}
+.nav button .ico{width:22px;text-align:center;font-size:17px}
+.nav button:hover,.nav button.active{background:linear-gradient(100deg,#32205b99,#102a4599);border-color:#8b5cf633;color:#fff}
+.nav button.active{box-shadow:inset 3px 0 var(--cyan)}
+.sidebar-bottom{margin-top:auto;padding:13px;border:1px solid var(--line);border-radius:16px;background:#111426}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:7px}
+.sidebar-bottom p{font-size:12px;color:var(--muted);margin:8px 0 0;line-height:1.5}
+main{min-width:0;padding:27px clamp(15px,3vw,40px) 45px;max-width:1600px;width:100%;margin:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:26px}
+.eyebrow{font-size:10px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase}
+h2{font-size:clamp(24px,3vw,34px);letter-spacing:-1px;margin:5px 0}
+.subtitle{font-size:13px;color:var(--muted);margin:0}
+.top-actions{display:flex;align-items:center;gap:9px}
+.search-wrap{position:relative}
+.search-wrap input{width:min(230px,35vw);padding:11px 13px 11px 38px;background:#111426;border:1px solid var(--line);border-radius:13px;color:var(--text)}
+.search-wrap span{position:absolute;left:12px;top:10px;color:var(--muted)}
+.icon-btn,.btn{border:1px solid var(--line);background:#15182a;color:var(--text);padding:10px 13px;border-radius:12px;transition:.2s}
+.icon-btn:hover,.btn:hover{transform:translateY(-1px);border-color:#38bdf877}
+.btn.primary{border:0;background:linear-gradient(110deg,#2563eb,#9333ea);box-shadow:0 7px 24px #6d28d933}
+.btn.danger{background:#3b1528;border-color:#fb718544;color:#fecdd3}
+.btn.small{padding:7px 10px;font-size:12px}
+.grid{display:grid;gap:17px}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}
+.card{background:linear-gradient(145deg,rgba(21,25,46,.96),rgba(13,16,31,.96));border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);min-width:0;animation:rise .45s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.stat-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#23305a;color:var(--cyan);font-size:18px}
+.stat-value{font-size:clamp(24px,3vw,32px);font-weight:750;letter-spacing:-1px;margin:13px 0 4px}
+.stat-note{font-size:11px;color:var(--muted)}
+.accent-blue{color:var(--blue)}.accent-purple{color:#c084fc}.accent-green{color:var(--green)}.accent-yellow{color:var(--yellow)}
+.main-grid{grid-template-columns:minmax(0,1.35fr) minmax(260px,.85fr);align-items:start}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}
+.card-head h3{margin:0;font-size:16px}.card-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.pill{font-size:10px;padding:6px 9px;border-radius:30px;background:#1e2540;color:#b9c5ff;border:1px solid var(--line)}
+.progress-track{height:7px;background:#242941;border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width .35s}
+.task-form{display:flex;gap:8px;margin-bottom:14px}
+.task-form input,.field,input.field,textarea.field,select.field{min-width:0;width:100%;background:#0b0e1d;border:1px solid var(--line);border-radius:11px;color:var(--text);padding:11px 12px}
+.task-form input{flex:1}
+.task-list{display:grid;gap:8px}
+.task{display:flex;align-items:center;gap:10px;padding:12px;background:#0c1020;border:1px solid #202640;border-radius:13px}
+.task input[type=checkbox]{accent-color:#8b5cf6;width:17px;height:17px;flex-shrink:0}
+.task-text{flex:1;min-width:0;overflow-wrap:anywhere;font-size:13px}
+.task.done .task-text{text-decoration:line-through;color:#777f9f}
+.task-meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.task-delete{border:0;background:transparent;color:#77809e;font-size:17px;padding:4px 6px}.task-delete:hover{color:var(--red)}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:23px 10px}
+.clock{font-size:clamp(34px,5vw,50px);letter-spacing:-2px;font-weight:750;margin:12px 0 0;font-variant-numeric:tabular-nums}
+.date-line{color:var(--muted);font-size:13px}
+.clock-orb{width:9px;height:9px;display:inline-block;background:var(--cyan);border-radius:50%;box-shadow:0 0 15px var(--cyan);margin-right:8px}
+.notes{min-height:130px;resize:vertical;line-height:1.6}
+.notes-footer{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;color:var(--muted);font-size:11px}
+.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.quick{border:1px solid var(--line);background:#101428;border-radius:15px;padding:15px;text-align:left;color:var(--text);transition:.2s}
+.quick:hover{transform:translateY(-2px);border-color:#38bdf866}
+.quick b{display:block;margin:9px 0 3px;font-size:13px}.quick small{color:var(--muted);font-size:11px}
+.quick .quick-icon{font-size:21px}
+.bottom-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:18px}
+.calc-display{background:#080b18;border:1px solid var(--line);padding:18px;border-radius:13px;text-align:right;margin-bottom:11px;overflow:hidden}
+.calc-expression{font-size:12px;color:var(--muted);min-height:18px;overflow-wrap:anywhere}
+.calc-result{font-size:29px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.calc-keys button{border:1px solid #242b49;background:#171d34;color:#eef1ff;border-radius:10px;padding:13px 4px;font-size:15px}
+.calc-keys button.operator{color:var(--cyan);background:#10253b}
+.calc-keys button.equal{background:linear-gradient(135deg,#0891b2,#4f46e5);border:0}
+.calc-keys button:active{transform:scale(.96)}
+.search-results{display:grid;gap:8px;margin-top:12px}
+.search-result{padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#0c1020;font-size:12px}
+.search-result small{display:block;color:var(--muted);margin-top:4px}
+.section{display:none}.section.active{display:block}
+.section-title{margin:0 0 16px;font-size:22px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filter-row input,.filter-row select{max-width:220px}
+.note-item{display:flex;gap:10px;align-items:flex-start;padding:12px;border-bottom:1px solid var(--line)}
+.note-item:last-child{border-bottom:0}
+.note-item .note-content{flex:1;overflow-wrap:anywhere;font-size:13px}
+.note-item small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#202844;border:1px solid #6474a7;color:#fff;border-radius:12px;padding:11px 16px;font-size:13px;z-index:50;transition:.25s;box-shadow:var(--shadow);max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.mobile-menu{display:none}
+footer{color:#656d8e;font-size:11px;text-align:center;padding:25px 0 0}
+@media(max-width:980px){.app{grid-template-columns:210px minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.main-grid{grid-template-columns:1fr}.sidebar{padding:18px 12px}main{padding:22px 18px}}
+@media(max-width:650px){
+ .app{display:block}.sidebar{position:fixed;left:0;top:0;width:270px;max-width:85vw;transform:translateX(-105%);transition:transform .25s;box-shadow:var(--shadow);height:100dvh}.sidebar.open{transform:translateX(0)}
+ main{padding:18px 13px 35px}.mobile-menu{display:inline-grid;place-items:center}
+ .topbar{align-items:flex-start}.topbar-left{display:flex;gap:10px;align-items:flex-start}.top-actions{gap:6px}.search-wrap input{width:42vw;max-width:170px}.top-actions .hide-mobile{display:none}
+ .stats{gap:10px}.card{padding:15px;border-radius:17px}.stat-value{font-size:27px}.main-grid,.bottom-grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .clock{font-size:42px}.task-form{flex-wrap:wrap}.task-form input{min-width:130px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-mark">N</div><div><h1>NEXUS</h1><small>PERSONAL SPACE</small></div></div>
+  <div class="nav-label">WORKSPACE</div>
+  <nav class="nav" id="nav">
+    <button class="active" data-page="dashboard"><span class="ico">◈</span>Dashboard</button>
+    <button data-page="tasks"><span class="ico">☑</span>Task Manager</button>
+    <button data-page="notes"><span class="ico">▤</span>Notes</button>
+    <button data-page="calculator"><span class="ico">⌗</span>Calculator</button>
+    <button data-page="search"><span class="ico">⌕</span>Search</button>
+    <button data-page="settings"><span class="ico">⚙</span>Settings</button>
+  </nav>
+  <div class="sidebar-bottom"><span class="status-dot"></span><strong style="font-size:12px">All systems ready</strong><p>Your personal workspace is running locally in this browser.</p></div>
+</aside>
+
+<main>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Open menu">☰</button>
+      <div><div class="eyebrow">YOUR PERSONAL WORKSPACE</div><h2 id="pageHeading">Welcome back.</h2><p class="subtitle" id="pageSubtitle">Your goals, tasks and ideas — all in one place.</p></div>
+    </div>
+    <div class="top-actions">
+      <label class="search-wrap"><span>⌕</span><input id="globalSearch" type="search" placeholder="Search Nexus..." aria-label="Search dashboard"></label>
+      <button class="icon-btn hide-mobile" id="themeBtn" title="Toggle glow">✦</button>
+    </div>
+  </header>
+
+  <section class="section active" id="page-dashboard">
+    <div class="grid stats">
+      <article class="card"><div class="stat-top"><span>Total Tasks</span><span class="stat-icon">☑</span></div><div class="stat-value" id="totalTasks">0</div><div class="stat-note">Tasks in your workspace</div></article>
+      <article class="card"><div class="stat-top"><span>Completed</span><span class="stat-icon accent-green">✓</span></div><div class="stat-value accent-green" id="completedTasks">0</div><div class="stat-note">Tasks checked off</div></article>
+      <article class="card"><div class="stat-top"><span>Completion</span><span class="stat-icon accent-purple">↗</span></div><div class="stat-value accent-purple" id="completionRate">0%</div><div class="stat-note">Overall task progress</div></article>
+      <article class="card"><div class="stat-top"><span>Notes Saved</span><span class="stat-icon accent-yellow">▤</span></div><div class="stat-value accent-yellow" id="notesCount">0</div><div class="stat-note">Saved note entries</div></article>
+    </div>
+
+    <div class="grid main-grid">
+      <article class="card">
+        <div class="card-head"><div><h3>Task overview</h3><p>Keep your next steps moving.</p></div><span class="pill" id="taskPill">0 tasks</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--muted)">Overall progress</span><strong id="progressText">0%</strong></div>
+        <div class="progress-track" style="margin-bottom:17px"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <form class="task-form" id="taskForm"><input id="taskInput" maxlength="180" placeholder="Add a new task..." aria-label="New task" required><select id="taskPriority" class="field" style="width:115px"><option value="Normal">Normal</option><option value="High">High priority</option><option value="Low">Low priority</option></select><button class="btn primary" type="submit">+ Add</button></form>
+        <div class="task-list" id="taskList"></div>
+        <button class="btn small" id="viewAllTasks" style="margin-top:12px">View all tasks →</button>
+      </article>
+      <div class="grid">
+        <article class="card">
+          <div class="card-head"><div><h3>Live clock</h3><p>Your local device time</p></div><span class="pill"><span class="clock-orb"></span>LIVE</span></div>
+          <div class="clock" id="clock">00:00:00</div><div class="date-line" id="dateLine">Loading date…</div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><h3>Quick notes</h3><p>Autosaved in this browser</p></div><span class="pill" id="saveStatus">READY</span></div>
+          <textarea class="field notes" id="quickNote" maxlength="10000" placeholder="Write an idea, reminder or thought..."></textarea>
+          <div class="notes-footer"><span id="noteChars">0 characters</span><button class="btn small" id="clearQuickNote">Clear</button></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><h3>Quick launch</h3><p>Jump straight into a tool.</p></div></div>
+          <div class="grid quick-grid">
+            <button class="quick" data-goto="tasks"><span class="quick-icon">☑</span><b>Tasks</b><small>Plan your day</small></button>
+            <button class="quick" data-goto="notes"><span class="quick-icon">▤</span><b>Notes</b><small>Keep your ideas</small></button>
+            <button class="quick" data-goto="calculator"><span class="quick-icon">⌗</span><b>Calculator</b><small>Quick calculations</small></button>
+            <button class="quick" data-goto="search"><span class="quick-icon">⌕</span><b>Search</b><small>Find saved items</small></button>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="grid bottom-grid">
+      <article class="card"><div class="card-head"><div><h3>Recent activity</h3><p>Latest updates in this session.</p></div><span class="pill">LOCAL</span></div><div id="activityList" class="search-results"></div></article>
+      <article class="card"><div class="card-head"><div><h3>Productivity snapshot</h3><p>Your current task breakdown.</p></div></div><div id="snapshot"></div></article>
+    </div>
+  </section>
+
+  <section class="section" id="page-tasks">
+    <h3 class="section-title">Task Manager</h3>
+    <article class="card">
+      <div class="card-head"><div><h3>All your tasks</h3><p>Add tasks, set priorities, and track progress.</p></div><span class="pill" id="allTaskCount">0 total</span></div>
+      <form class="task-form" id="allTaskForm"><input id="allTaskInput" maxlength="180" placeholder="What needs to get done?" required><select id="allTaskPriority" class="field" style="width:130px"><option>Normal</option><option>High</option><option>Low</option></select><button class="btn primary" type="submit">Add task</button></form>
+      <div class="filter-row"><input class="field" id="taskFilterText" placeholder="Filter tasks..."><select class="field" id="taskFilterStatus"><option value="all">All statuses</option><option value="active">Active</option><option value="done">Completed</option></select><select class="field" id="taskFilterPriority"><option value="all">All priorities</option><option>High</option><option>Normal</option><option>Low</option></select><button class="btn small" id="clearCompleted">Clear completed</button></div>
+      <div class="task-list" id="allTaskList"></div>
+    </article>
+  </section>
+
+  <section class="section" id="page-notes">
+    <h3 class="section-title">Notes & Ideas</h3>
+    <div class="grid main-grid">
+      <article class="card"><div class="card-head"><div><h3>Write a note</h3><p>Your notes are stored on this device/browser.</p></div></div><input class="field" id="noteTitle" maxlength="100" placeholder="Note title" style="margin-bottom:10px"><textarea class="field notes" id="noteBody" maxlength="10000" placeholder="Start writing..." style="min-height:180px"></textarea><button class="btn primary" id="saveNote" style="margin-top:12px">Save note</button></article>
+      <article class="card"><div class="card-head"><div><h3>Saved notes</h3><p id="savedNotesSubtitle">Your personal notebook.</p></div><span class="pill" id="savedNotesCount">0</span></div><div id="savedNotesList"></div></article>
+    </div>
+  </section>
+
+  <section class="section" id="page-calculator">
+    <h3 class="section-title">Calculator</h3>
+    <div class="grid main-grid">
+      <article class="card" style="max-width:520px;width:100%">
+        <div class="card-head"><div><h3>NEXUS Calculator</h3><p>Basic arithmetic calculator.</p></div><span class="pill">MATH</span></div>
+        <div class="calc-display"><div class="calc-expression" id="calcExpression">Ready</div><div class="calc-result" id="calcResult">0</div></div>
+        <div class="calc-keys" id="calcKeys">
+          <button data-calc="AC" class="operator">AC</button><button data-calc="(" class="operator">(</button><button data-calc=")" class="operator">)</button><button data-calc="DEL" class="operator">⌫</button>
+          <button data-calc="7">7</button><button data-calc="8">8</button><button data-calc="9">9</button><button data-calc="/" class="operator">÷</button>
+          <button data-calc="4">4</button><button data-calc="5">5</button><button data-calc="6">6</button><button data-calc="*" class="operator">×</button>
+          <button data-calc="1">1</button><button data-calc="2">2</button><button data-calc="3">3</button><button data-calc="-" class="operator">−</button>
+          <button data-calc="0">0</button><button data-calc=".">.</button><button data-calc="=" class="equal">=</button><button data-calc="+" class="operator">+</button>
+        </div>
+      </article>
+      <article class="card"><div class="card-head"><div><h3>Calculator tips</h3><p>Keyboard-friendly input.</p></div></div><p style="font-size:13px;color:var(--muted);line-height:1.8">Use the keypad to enter an expression. Parentheses help group calculations. The calculator checks the expression before evaluating it.</p><div class="pill" style="display:inline-block">Example: (12 + 8) × 3</div></article>
+    </div>
+  </section>
+
+  <section class="section" id="page-search">
+    <h3 class="section-title">Search Workspace</h3>
+    <article class="card"><div class="card-head"><div><h3>Find anything</h3><p>Search through tasks, notes and your quick note.</p></div></div><input class="field" id="workspaceSearch" placeholder="Type to search..." style="max-width:600px"><div id="workspaceResults" class="search-results"><div class="empty">Enter a word to search your saved workspace.</div></div></article>
+  </section>
+
+  <section class="section" id="page-settings">
+    <h3 class="section-title">Settings & Data</h3>
+    <div class="grid main-grid">
+      <article class="card"><div class="card-head"><div><h3>Appearance</h3><p>Customize your workspace.</p></div></div><label style="display:block;font-size:13px;margin-bottom:8px">Accent color</label><select class="field" id="accentSelect"><option value="blue">Neon Blue + Purple</option><option value="green">Neon Green</option><option value="pink">Neon Pink</option></select><p style="font-size:12px;color:var(--muted);line-height:1.6">Your preference is saved locally in this browser.</p><button class="btn" id="resetAccent">Reset appearance</button></article>
+      <article class="card"><div class="card-head"><div><h3>Backup & restore</h3><p>Export your data or import a previous backup.</p></div></div><p style="font-size:12px;color:var(--muted);line-height:1.7">Create a JSON backup of your tasks, notes and quick note. Keep it somewhere safe.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="exportData">Export backup</button><button class="btn" id="importBtn">Import backup</button><input type="file" id="importFile" accept=".json,application/json" hidden></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><button class="btn danger" id="resetData">Reset all local data</button><p style="font-size:11px;color:var(--muted)">Reset permanently clears NEXUS data stored in this browser.</p></article>
+    </div>
+  </section>
+  <footer>NEXUS PERSONAL DASHBOARD · Built for your browser · Your data stays on this device</footer>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const STORAGE_KEY = 'nexus_dashboard_v1';
+const defaultData = () => ({tasks:[],notes:[],quickNote:'',accent:'blue',activity:[]});
+let data = loadData();
+let calcExpr = '';
+let toastTimer;
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultData();
+    const parsed=JSON.parse(raw);
+    return { ...defaultData(), ...parsed,
+      tasks:Array.isArray(parsed.tasks)?parsed.tasks:[],
+      notes:Array.isArray(parsed.notes)?parsed.notes:[],
+      activity:Array.isArray(parsed.activity)?parsed.activity:[]
+    };
+  }catch(e){return defaultData()}
+}
+function persist(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));return true}
+  catch(e){notify('Could not save. Browser storage may be disabled.');return false}
+}
+function notify(message){
+  const el=$('#toast');el.textContent=message;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function recordActivity(message){
+  data.activity.unshift({message,time:new Date().toISOString()});
+  data.activity=data.activity.slice(0,8);persist();renderActivity();
+}
+function fmtDate(iso){
+  try{return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+  catch(e){return ''}
+}
+function addTask(text,priority){
+  const clean=text.trim();if(!clean)return;
+  data.tasks.unshift({id:makeId(),text:clean,priority:['High','Normal','Low'].includes(priority)?priority:'Normal',done:false,created:new Date().toISOString()});
+  persist();recordActivity('Task added: '+clean);renderAll();notify('Task added');
+}
+function makeId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function toggleTask(id){
+  const task=data.tasks.find(t=>t.id===id);if(!task)return;
+  task.done=!task.done;persist();recordActivity((task.done?'Completed: ':'Reopened: ')+task.text);renderAll();
+}
+function deleteTask(id){
+  const task=data.tasks.find(t=>t.id===id);if(!task)return;
+  data.tasks=data.tasks.filter(t=>t.id!==id);persist();recordActivity('Task deleted: '+task.text);renderAll();notify('Task deleted');
+}
+function taskMarkup(task){
+  const priorityClass=task.priority==='High'?'accent-yellow':task.priority==='Low'?'accent-blue':'';
+  return `<div class="task ${task.done?'done':''}"><input type="checkbox" data-toggle-task="${escapeHTML(task.id)}" ${task.done?'checked':''} aria-label="Complete task"><div class="task-text">${escapeHTML(task.text)}<span class="task-meta"><span class="${priorityClass}">${escapeHTML(task.priority)} priority</span> · ${fmtDate(task.created)}</span></div><button class="task-delete" data-delete-task="${escapeHTML(task.id)}" aria-label="Delete task">×</button></div>`;
+}
+function renderTaskList(target,tasks,emptyText){
+  const el=$(target);el.innerHTML=tasks.length?tasks.map(taskMarkup).join(''):`<div class="empty">${escapeHTML(emptyText)}</div>`;
+}
+function renderStats(){
+  const total=data.tasks.length,done=data.tasks.filter(t=>t.done).length,rate=total?Math.round(done/total*100):0;
+  $('#totalTasks').textContent=total;$('#completedTasks').textContent=done;$('#completionRate').textContent=rate+'%';$('#notesCount').textContent=data.notes.length;
+  $('#taskPill').textContent=total+' tasks';$('#progressText').textContent=rate+'%';$('#progressFill').style.width=rate+'%';$('#allTaskCount').textContent=total+' total';
+  const high=data.tasks.filter(t=>t.priority==='High'&&!t.done).length,active=total-done;
+  $('#snapshot').innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:15px;font-size:13px"><span style="color:var(--muted)">In progress</span><strong>${active}</strong></div><div class="progress-track" style="margin-bottom:18px"><div class="progress-fill" style="width:${total?active/total*100:0}%;background:linear-gradient(90deg,#fbbf24,#fb7185)"></div></div><div style="display:flex;justify-content:space-between;margin-bottom:15px;font-size:13px"><span style="color:var(--muted)">High priority left</span><strong class="accent-yellow">${high}</strong></div><div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">Completed</span><strong class="accent-green">${done}</strong></div>`;
+}
+function renderActivity(){
+  const el=$('#activityList');
+  el.innerHTML=data.activity.length?data.activity.map(a=>`<div class="search-result">${escapeHTML(a.message)}<small>${fmtDate(a.time)}</small></div>`).join(''):'<div class="empty">Your recent activity will appear here.</div>';
+}
+function renderTasks(){
+  renderTaskList('#taskList',data.tasks.filter(t=>!t.done).slice(0,4),'No active tasks. Add one above to get started.');
+  const q=$('#taskFilterText').value.trim().toLowerCase(),status=$('#taskFilterStatus').value,priority=$('#taskFilterPriority').value;
+  const filtered=data.tasks.filter(t=>(!q||t.text.toLowerCase().includes(q))&&(status==='all'||(status==='done'?t.done:!t.done))&&(priority==='all'||t.priority===priority));
+  renderTaskList('#allTaskList',filtered,'No tasks match those filters.');
+}
+function renderNotes(){
+  $('#savedNotesCount').textContent=data.notes.length;$('#savedNotesSubtitle').textContent=data.notes.length+' saved note'+(data.notes.length===1?'':'s');
+  $('#savedNotesList').innerHTML=data.notes.length?data.notes.map(n=>`<div class="note-item"><div class="note-content"><strong>${escapeHTML(n.title||'Untitled note')}</strong><div style="white-space:pre-wrap;color:var(--muted);margin-top:6px">${escapeHTML(n.body)}</div><small>${fmtDate(n.updated)}</small></div><button class="btn small" data-edit-note="${escapeHTML(n.id)}">Edit</button><button class="task-delete" data-delete-note="${escapeHTML(n.id)}" aria-label="Delete note">×</button></div>`).join(''):'<div class="empty">No saved notes yet. Write your first note.</div>';
+}
+function renderAll(){renderStats();renderTasks();renderNotes();renderActivity();applyAccent()}
+function tick(){
+  const now=new Date();
+  $('#clock').textContent=now.toLocaleTimeString(undefined,{hour12:false});
+  $('#dateLine').textContent=now.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+const pageInfo={
+ dashboard:['Welcome back.','Your goals, tasks and ideas — all in one place.'],
+ tasks:['Task Manager','Organize the things you want to get done.'],
+ notes:['Notes & Ideas','Capture your thoughts and keep them close.'],
+ calculator:['Calculator','Quick calculations in your personal workspace.'],
+ search:['Search Workspace','Find tasks and notes stored in NEXUS.'],
+ settings:['Settings','Customize your dashboard and manage your data.']
+};
+function goPage(page){
+  if(!pageInfo[page])return;
+  $$('.section').forEach(s=>s.classList.toggle('active',s.id==='page-'+page));
+  $$('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  $('#pageHeading').textContent=pageInfo[page][0];$('#pageSubtitle').textContent=pageInfo[page][1];
+  $('#sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'});
+}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)goPage(b.dataset.page)});
+$$('[data-goto]').forEach(b=>b.addEventListener('click',()=>goPage(b.dataset.goto)));
+$('#menuBtn').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
+$('#viewAllTasks').addEventListener('click',()=>goPage('tasks'));
+$('#taskForm').addEventListener('submit',e=>{e.preventDefault();addTask($('#taskInput').value,$('#taskPriority').value);$('#taskInput').value='';$('#taskInput').focus()});
+$('#allTaskForm').addEventListener('submit',e=>{e.preventDefault();addTask($('#allTaskInput').value,$('#allTaskPriority').value);$('#allTaskInput').value='';});
+document.addEventListener('change',e=>{
+  if(e.target.matches('[data-toggle-task]'))toggleTask(e.target.dataset.toggleTask);
+  if(e.target.matches('#taskFilterText,#taskFilterStatus,#taskFilterPriority'))renderTasks();
+});
+document.addEventListener('click',e=>{
+  const delTask=e.target.closest('[data-delete-task]');if(delTask){deleteTask(delTask.dataset.deleteTask);return}
+  const delNote=e.target.closest('[data-delete-note]');if(delNote){const id=delNote.dataset.deleteNote;data.notes=data.notes.filter(n=>n.id!==id);persist();recordActivity('A note was deleted');renderAll();notify('Note deleted');return}
+  const edit=e.target.closest('[data-edit-note]');if(edit){const n=data.notes.find(n=>n.id===edit.dataset.editNote);if(n){$('#noteTitle').value=n.title;$('#noteBody').value=n.body;$('#saveNote').dataset.editing=n.id;goPage('notes');$('#noteTitle').focus()}return}
+});
+$('#clearCompleted').addEventListener('click',()=>{
+  const count=data.tasks.filter(t=>t.done).length;if(!count){notify('No completed tasks to clear');return}
+  if(confirm('Delete '+count+' completed task(s)?')){data.tasks=data.tasks.filter(t=>!t.done);persist();recordActivity(count+' completed tasks cleared');renderAll();notify('Completed tasks cleared')}
+});
+$('#quickNote').value=data.quickNote;
+function updateQuickNote(){
+  data.quickNote=$('#quickNote').value;persist();$('#noteChars').textContent=data.quickNote.length+' characters';$('#saveStatus').textContent='SAVED';
+}
+$('#quickNote').addEventListener('input',()=>{updateQuickNote()});
+$('#clearQuickNote').addEventListener('click',()=>{if(!$('#quickNote').value)return;$('#quickNote').value='';updateQuickNote();notify('Quick note cleared')});
+$('#saveNote').addEventListener('click',()=>{
+  const title=$('#noteTitle').value.trim(),body=$('#noteBody').value.trim();if(!title&&!body){notify('Write a title or note first');return}
+  const editing=$('#saveNote').dataset.editing;
+  if(editing){const n=data.notes.find(n=>n.id===editing);if(n){n.title=title||'Untitled note';n.body=body;n.updated=new Date().toISOString()}delete $('#saveNote').dataset.editing}
+  else data.notes.unshift({id:makeId(),title:title||'Untitled note',body,updated:new Date().toISOString()});
+  persist();recordActivity((editing?'Updated':'Saved')+' a note');$('#noteTitle').value='';$('#noteBody').value='';renderAll();notify(editing?'Note updated':'Note saved');
+});
+function searchWorkspace(query){
+  const q=query.trim().toLowerCase(),out=[];
+  if(!q){$('#workspaceResults').innerHTML='<div class="empty">Enter a word to search your saved workspace.</div>';return}
+  data.tasks.forEach(t=>{if(t.text.toLowerCase().includes(q))out.push({title:t.text,kind:'Task',meta:(t.done?'Completed':'Active')+' · '+t.priority+' priority'})});
+  data.notes.forEach(n=>{if((n.title+' '+n.body).toLowerCase().includes(q))out.push({title:n.title||'Untitled note',kind:'Note',meta:n.body.slice(0,100)})});
+  if(data.quickNote.toLowerCase().includes(q))out.push({title:'Quick note',kind:'Quick note',meta:data.quickNote.slice(0,120)});
+  $('#workspaceResults').innerHTML=out.length?out.map(r=>`<div class="search-result"><strong>${escapeHTML(r.title)}</strong><small>${escapeHTML(r.kind)} · ${escapeHTML(r.meta)}</small></div>`).join(''):'<div class="empty">No matching tasks or notes found.</div>';
+}
+$('#workspaceSearch').addEventListener('input',e=>searchWorkspace(e.target.value));
+$('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){goPage('search');$('#workspaceSearch').value=e.target.value;searchWorkspace(e.target.value)}});
+$('#globalSearch').addEventListener('input',e=>{if(e.target.value.length>1){goPage('search');$('#workspaceSearch').value=e.target.value;searchWorkspace(e.target.value)}});
+$('#themeBtn').addEventListener('click',()=>{document.body.classList.toggle('extra-glow');document.body.style.filter=document.body.classList.contains('extra-glow')?'saturate(1.3)':'none';notify('Glow effect toggled')});
+function applyAccent(){
+ const root=document.documentElement;
+ const themes={blue:['#38bdf8','#a855f7','#22d3ee'],green:['#4ade80','#14b8a6','#a3e635'],pink:['#f472b6','#8b5cf6','#fb7185']};
+ const t=themes[data.accent]||themes.blue;root.style.setProperty('--blue',t[0]);root.style.setProperty('--purple',t[1]);root.style.setProperty('--cyan',t[2]);
+ $('#accentSelect').value=data.accent;
+}
+$('#accentSelect').addEventListener('change',e=>{data.accent=e.target.value;persist();applyAccent();notify('Appearance saved')});
+$('#resetAccent').addEventListener('click',()=>{data.accent='blue';persist();applyAccent();notify('Appearance reset')});
+$('#exportData').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify({...data,exportedAt:new Date().toISOString(),app:'NEXUS'},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='nexus-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);notify('Backup export started');
+});
+$('#importBtn').addEventListener('click',()=>$('#importFile').click());
+$('#importFile').addEventListener('change',async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  const obj=JSON.parse(await file.text());
+  if(!obj||!Array.isArray(obj.tasks)||!Array.isArray(obj.notes))throw new Error('Invalid backup');
+  if(!confirm('Import backup and replace current NEXUS data?'))return;
+  data={...defaultData(),tasks:obj.tasks.filter(t=>t&&typeof t.text==='string').map(t=>({id:String(t.id||makeId()),text:t.text.slice(0,180),priority:['High','Normal','Low'].includes(t.priority)?t.priority:'Normal',done:!!t.done,created:t.created||new Date().toISOString()})),notes:obj.notes.filter(n=>n&&typeof n.body==='string').map(n=>({id:String(n.id||makeId()),title:String(n.title||'Untitled note').slice(0,100),body:n.body.slice(0,10000),updated:n.updated||new Date().toISOString()})),quickNote:typeof obj.quickNote==='string'?obj.quickNote.slice(0,10000):'',accent:['blue','green','pink'].includes(obj.accent)?obj.accent:'blue',activity:Array.isArray(obj.activity)?obj.activity.slice(0,8):[]};
+  persist();$('#quickNote').value=data.quickNote;updateQuickNote();renderAll();notify('Backup imported');
+ }catch(err){notify('That backup file is invalid')}
+ finally{e.target.value=''}
+});
+$('#resetData').addEventListener('click',()=>{
+ if(!confirm('This will permanently delete all NEXUS tasks, notes and settings in this browser. Continue?'))return;
+ data=defaultData();persist();$('#quickNote').value='';$('#noteChars').textContent='0 characters';$('#noteTitle').value='';$('#noteBody').value='';delete $('#saveNote').dataset.editing;renderAll();notify('Local data reset');
+});
+function safeCalculate(expr){
+ if(!expr||! /^[0-9+\-*/().\s]+$/.test(expr))throw new Error('Invalid expression');
+ // Parse only arithmetic tokens; never execute arbitrary JavaScript.
+ const tokens=expr.match(/\d*\.?\d+|[()+\-*/]/g);
+ if(!tokens||tokens.join('').replace(/\s/g,'')!==expr.replace(/\s/g,''))throw new Error('Invalid expression');
+ let pos=0;
+ function factor(){
+  const t=tokens[pos++];
+  if(t==='+')return factor();
+  if(t==='-')return -factor();
+  if(t==='('){const v=expression();if(tokens[pos++]!==')')throw new Error('Missing )');return v}
+  if(t===undefined||!Number.isFinite(Number(t)))throw new Error('Expected number');
+  return Number(t);
+ }
+ function term(){let v=factor();while(tokens[pos]==='*'||tokens[pos]==='/'){const op=tokens[pos++],r=factor();v=op==='*'?v*r:v/r}return v}
+ function expression(){let v=term();while(tokens[pos]==='+'||tokens[pos]==='-'){const op=tokens[pos++],r=term();v=op==='+'?v+r:v-r}return v}
+ const result=expression();if(pos!==tokens.length||!Number.isFinite(result))throw new Error('Invalid result');return result;
+}
+function calcInput(key){
+ if(key==='AC'){calcExpr='';$('#calcExpression').textContent='Ready';$('#calcResult').textContent='0';return}
+ if(key==='DEL'){calcExpr=calcExpr.slice(0,-1);$('#calcExpression').textContent=calcExpr||'Ready';$('#calcResult').textContent=calcExpr||'0';return}
+ if(key==='='){
+  try{const result=safeCalculate(calcExpr);$('#calcExpression').textContent=calcExpr+' =';$('#calcResult').textContent=String(Number(result.toPrecision(12)));calcExpr=String(Number(result.toPrecision(12)))}
+  catch(e){$('#calcExpression').textContent='Check your expression';$('#calcResult').textContent='Error'}
+  return;
+ }
+ if(calcExpr.length<100){calcExpr+=key;$('#calcExpression').textContent=calcExpr;$('#calcResult').textContent=calcExpr}
+}
+$('#calcKeys').addEventListener('click',e=>{const b=e.target.closest('[data-calc]');if(b)calcInput(b.dataset.calc)});
+document.addEventListener('keydown',e=>{
+ if($('#page-calculator').classList.contains('active')&&!e.ctrlKey&&!e.metaKey){
+  if(/^[0-9()+\-*/.]$/.test(e.key)){calcInput(e.key)}
+  else if(e.key==='Enter'||e.key==='='){e.preventDefault();calcInput('=')}
+  else if(e.key==='Backspace'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){calcInput('DEL')}
+  else if(e.key==='Escape')calcInput('AC');
+ }
+});
+$('#noteChars').textContent=data.quickNote.length+' characters';
+$('#saveStatus').textContent='SAVED';
+renderAll();tick();setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
